@@ -1,121 +1,73 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [cep, setCep] = useState('')
+  const [rua, setRua] = useState('')
+  const [bairro, setBairro] = useState('')
+  const [cidade, setCidade] = useState('')
+  const [estado, setEstado] = useState('')
+
+  // 1. A NOVA FUNÇÃO: O detetive que busca o CEP na internet
+  const buscarCEP = async () => {
+    // Limpa o texto para garantir que só tem números
+    const cepNumeros = cep.replace(/\D/g, '');
+    
+    // Só vai na internet se o CEP tiver exatamente 8 números
+    if (cepNumeros.length === 8) {
+      try {
+        const resposta = await fetch(`https://viacep.com.br/ws/${cepNumeros}/json/`);
+        const dados = await resposta.json();
+
+        if (!dados.erro) {
+          setRua(dados.logradouro);
+          setBairro(dados.bairro);
+          setCidade(dados.localidade);
+          setEstado(dados.uf);
+        } else {
+          alert("Ops! Esse CEP não existe.");
+        }
+      } catch (erro) {
+        console.error("Erro na comunicação com o ViaCEP", erro);
+      }
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="container">
+      <h1>Cadastro Inteligente</h1>
+      
+      <form>
+        <div className="grupo-campos">
+          <input type="text" placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
+          <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="grupo-campos">
+          <input 
+            type="text" 
+            placeholder="Digite o CEP (Ex: 01001000)" 
+            value={cep}
+            onChange={(e) => setCep(e.target.value)}
+            onBlur={buscarCEP} // 2. O GATILHO: Dispara a busca quando você clica fora do campo!
+          />
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <div className="grupo-campos">
+          <input type="text" placeholder="Rua" value={rua} onChange={(e) => setRua(e.target.value)} />
+          <input type="text" placeholder="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
+        </div>
+
+        <div className="grupo-campos">
+          <input type="text" placeholder="Cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
+          <input type="text" placeholder="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} />
+        </div>
+
+        <button type="submit">Cadastrar Usuário</button>
+      </form>
+    </div>
   )
 }
 
